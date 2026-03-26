@@ -1,0 +1,7 @@
+# Default bazel configuration
+build --enable_bzlmod
+
+# Don't try to use standard C/C++ compiler if unnecessary for pure HDL rules
+# build --crosstool_top=//custom_toolchain:empty
+
+test --test_output=errors

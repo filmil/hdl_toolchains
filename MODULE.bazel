@@ -1,0 +1,4 @@
+module(
+    name = "hdl_toolchains",
+    version = "0.0.1",
+)
