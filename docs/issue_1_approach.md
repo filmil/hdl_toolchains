@@ -115,6 +115,8 @@ vhdl_library = rule(
 )
 ```
 
+*(Note: Bazel rules implicitly support common attributes like `tags`, `visibility`, and `testonly`. Our implementations should pass these through properly or rely on Bazel's native handling without redefining them in `attrs` to avoid conflicts).*
+
 ### 4. Bzlmod Integration and External Repositories
 
 Use repository rules and Bzlmod to fetch pre-compiled binaries of the required HDL tools seamlessly.
