@@ -1,0 +1,60 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Once a week, so a break caused by a moving dependency is noticed
+    # even when nothing lands.
+    - cron: "29 5 * * 2"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup bazel
+        uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+
+      # The key carries the UTC date, so an entry is only restored on the
+      # day it was written. restore-keys still seeds a new day from the
+      # previous one, so the first run of the day starts warm.
+      - name: Compute the daily cache key
+        id: cachekey
+        run: echo "day=$(date -u +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ steps.cachekey.outputs.day }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Build
+        run: bazel build //...
+
+      # The repository is still a design document and declares no targets,
+      # so a bare `bazel test //...` would exit 4 with "No test targets
+      # were found, yet testing was requested" and fail the job. Ask first.
+      # The step then starts testing the day the first test lands, with no
+      # edit to this file needed at that point.
+      - name: Test
+        run: |
+          if [ -n "$(bazel query 'tests(//...)' 2>/dev/null)" ]; then
+            bazel test //...
+          else
+            echo "no test targets declared yet; nothing to run"
+          fi
