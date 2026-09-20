@@ -1,2 +1,4 @@
 bazel-*
 integration/
+user.bazelrc
+MODULE.bazel.lock
