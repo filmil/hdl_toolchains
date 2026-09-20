@@ -1,7 +1,16 @@
 # Default bazel configuration
-build --enable_bzlmod
+
+# The custom registry carries the local modules and BCR carries the rest.
+# Bazel takes the first registry that holds a module, so the custom one
+# has to come first for it to override anything. These are `common` and
+# not `build`, because with `build` they apply to build commands alone
+# and `bazel mod tidy` and `bazel query` resolve against BCR only.
+common --registry=https://raw.githubusercontent.com/filmil/bazel-registry/main
+common --registry=https://bcr.bazel.build
 
 # Don't try to use standard C/C++ compiler if unnecessary for pure HDL rules
 # build --crosstool_top=//custom_toolchain:empty
 
 test --test_output=errors
+
+try-import %workspace%/user.bazelrc
