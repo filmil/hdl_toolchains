@@ -34,6 +34,8 @@ The one simulator so far is [xezim](https://github.com/aionhw/xezim). It is
 built from source by the xezim module in
 [filmil/bazel-registry](https://github.com/filmil/bazel-registry) and
 registered by this module. Like that module, it builds only on Linux x86_64.
+From version 0.11.7.bcr.1 on, the module builds xezim with a pinned clang and
+a pinned Debian sysroot, not with the host's C compiler.
 With it, both `$fatal` and `$error` fail the test.
 
 To use it, add the registry, as `.bazelrc` here does, and depend on this
