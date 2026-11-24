@@ -1,0 +1,95 @@
+load("@hdl_toolchains//sim:defs.bzl", "sim_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+# Defines, an include header, a plusarg and a top all have to reach the
+# design, or it stops with $fatal.
+sim_test(
+    name = "counter_test",
+    srcs = ["counter.sv"],
+    defines = {
+        "CHECKED": "",
+        "LIMIT": "10",
+    },
+    hdrs = ["include/step.svh"],
+    plusargs = ["go"],
+    top = "counter_tb",
+)
+
+sim_test(
+    name = "counter_waves",
+    srcs = ["counter.sv"],
+    defines = {
+        "CHECKED": "",
+        "LIMIT": "10",
+    },
+    includes = ["include"],
+    data = ["include/step.svh"],
+    plusargs = ["go"],
+    tags = ["manual"],
+    top = "counter_tb",
+    waves = True,
+)
+
+sh_test(
+    name = "waves_test",
+    srcs = ["waves_check.sh"],
+    args = [
+        "$(rootpath :counter_waves)",
+        "counter_waves.fst",
+    ],
+    data = [":counter_waves"],
+)
+
+# These must fail, so they are run by a test that expects that.
+sim_test(
+    name = "fatal_sim",
+    srcs = ["fatal.sv"],
+    tags = ["manual"],
+)
+
+sh_test(
+    name = "fatal_test",
+    srcs = ["expect_fail.sh"],
+    args = [
+        "$(rootpath :fatal_sim)",
+        "expected fatal",
+    ],
+    data = [":fatal_sim"],
+)
+
+sim_test(
+    name = "error_sim",
+    srcs = ["error.sv"],
+    tags = ["manual"],
+)
+
+sh_test(
+    name = "error_test",
+    srcs = ["expect_fail.sh"],
+    args = [
+        "$(rootpath :error_sim)",
+        "expected error",
+    ],
+    data = [":error_sim"],
+)
+
+# The define is missing, so the design stops with $fatal.
+sim_test(
+    name = "missing_define_sim",
+    srcs = ["counter.sv"],
+    defines = {"LIMIT": "10"},
+    hdrs = ["include/step.svh"],
+    plusargs = ["go"],
+    tags = ["manual"],
+    top = "counter_tb",
+)
+
+sh_test(
+    name = "missing_define_test",
+    srcs = ["expect_fail.sh"],
+    args = [
+        "$(rootpath :missing_define_sim)",
+        "define CHECKED missing",
+    ],
+    data = [":missing_define_sim"],
+)
