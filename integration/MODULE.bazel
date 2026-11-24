@@ -1,0 +1,10 @@
+# Uses hdl_toolchains the way a downstream module would.
+module(name = "hdl_toolchains_integration")
+
+bazel_dep(name = "hdl_toolchains")
+local_path_override(
+    module_name = "hdl_toolchains",
+    path = "..",
+)
+
+bazel_dep(name = "rules_shell", version = "0.8.0")

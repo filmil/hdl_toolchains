@@ -1,0 +1,19 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+# Simulators of HDL designs. A toolchain of this type runs a simulation of
+# the given sources and exits nonzero when the simulation fails.
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "defs",
+    srcs = [
+        "defs.bzl",
+        "providers.bzl",
+        "sim_test.bzl",
+        "toolchain.bzl",
+    ],
+    visibility = ["//visibility:public"],
+)

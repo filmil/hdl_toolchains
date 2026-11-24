@@ -1,0 +1,42 @@
+load("//sim:defs.bzl", "sim_toolchain")
+
+# xezim, from the filmil/bazel-registry module. Its option spellings are
+# from its docs/command-line.md.
+sim_toolchain(
+    name = "xezim",
+    # --no-cache: xezim otherwise caches elaborated designs under ~/.cache.
+    # --error-exit: an $error fails the run, as $fatal always does.
+    extra_args = [
+        "--no-cache",
+        "--error-exit",
+    ],
+    define = ["+define+{name}={value}"],
+    define_bare = ["+define+{name}"],
+    incdir = ["+incdir+{dir}"],
+    plusarg = ["+{arg}"],
+    simulator = "@xezim",
+    top = [
+        "-top",
+        "{top}",
+    ],
+    waves = [
+        "--fst",
+        "{file}",
+    ],
+    waves_extension = "fst",
+)
+
+toolchain(
+    name = "toolchain",
+    # The xezim module builds on Linux x86_64 only.
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":xezim",
+    toolchain_type = "//sim:toolchain_type",
+)

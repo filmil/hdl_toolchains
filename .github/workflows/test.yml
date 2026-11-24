@@ -46,15 +46,8 @@ jobs:
       - name: Build
         run: bazel build //...
 
-      # The repository is still a design document and declares no targets,
-      # so a bare `bazel test //...` would exit 4 with "No test targets
-      # were found, yet testing was requested" and fail the job. Ask first.
-      # The step then starts testing the day the first test lands, with no
-      # edit to this file needed at that point.
-      - name: Test
-        run: |
-          if [ -n "$(bazel query 'tests(//...)' 2>/dev/null)" ]; then
-            bazel test //...
-          else
-            echo "no test targets declared yet; nothing to run"
-          fi
+      # The rules are tested from integration/, a workspace that uses this
+      # module the way a downstream module would.
+      - name: Integration tests
+        working-directory: integration
+        run: bazel test //...

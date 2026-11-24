@@ -2,3 +2,9 @@ module(
     name = "hdl_toolchains",
     version = "0.0.1",
 )
+
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "xezim", version = "0.11.7")
+
+register_toolchains("//sim/xezim:toolchain")
